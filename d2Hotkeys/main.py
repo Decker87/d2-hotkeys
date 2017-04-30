@@ -46,7 +46,6 @@ def processHookedEvents(hooker):
 
     while True:
         keyEvent = hooker.eventQueue.get()
-        print keyEvent
 
         # First see if it was the special key to enable / disable hooking
         if keyEvent.keycode == pauseKey:
@@ -76,11 +75,9 @@ def processHookedEvents(hooker):
         # Key down event
         if keyEvent.isDownEvent:
             if quickKeyMapping.preKey:
-                print "Tapping key 0x%02x" % (quickKeyMapping.preKey)
-                #tapKey(quickKeyMapping.preKey, delayMid = 0.02, delayAfter = 0.02)
+                tapKey(quickKeyMapping.preKey, delayMid = 0.02, delayAfter = 0.02)
             if buttonDownCounts[quickKeyMapping.button] == 0:
-                print "Pressing mouse button: %s" % (quickKeyMapping.button)
-                #pressMouseButton(quickKeyMapping.button, delay = 0)
+                pressMouseButton(quickKeyMapping.button, delay = 0)
             buttonDownCounts[quickKeyMapping.button] += 1
 
         # Key up event
@@ -89,8 +86,7 @@ def processHookedEvents(hooker):
             if buttonDownCounts[quickKeyMapping.button] > 0:
                 buttonDownCounts[quickKeyMapping.button] -= 1
             if buttonDownCounts[quickKeyMapping.button] == 0:
-                print "Releasing mouse button: %s" % (quickKeyMapping.button)
-                #releaseMouseButton(quickKeyMapping.button, delay = 0)
+                releaseMouseButton(quickKeyMapping.button, delay = 0)
 
 def startHooking():
     global quickKeyMappings
@@ -100,21 +96,20 @@ def startHooking():
     
     # Pause and message are two special cases
     keyHookBehaviors.append(Hooker.tKeyHookBehavior(keycode = pauseKey, passThrough = False, ignorePause = True))
-    keyHookBehaviors.append(Hooker.tKeyHookBehavior(keycode = chatKey, passThrough = True, ignorePause = False))
+    keyHookBehaviors.append(Hooker.tKeyHookBehavior(keycode = chatKey, passThrough = True, ignorePause = True))
 
     # Add hooks from quick keys
     for keycode in quickKeyMappings:
         keyHookBehaviors.append(Hooker.tKeyHookBehavior(keycode = keycode, passThrough = False, ignorePause = False))
 
     # Start it up scotty
-    hooker = Hooker(keyHookBehaviors)
+    hooker = Hooker(keyHookBehaviors, "Diablo II")
     hooker.start()
+    hooker.pause()
+    badBeep()
 
     return hooker
 
 if __name__ == "__main__":
-    sleep(1)
-    goodBeep()
-
     hooker = startHooking()
     processHookedEvents(hooker)

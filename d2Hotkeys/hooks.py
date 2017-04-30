@@ -74,7 +74,7 @@ class Hooker:
             # print "Key %i is already up, not adding to queue." % (keycode)
             pass
         else:
-            print "Adding to eventQueue: %s" % (keyEvent.__str__())
+            # print "Adding to eventQueue: %s" % (keyEvent.__str__())
             self.eventQueue.put(keyEvent, block = False)
             if isDownEvent:
                 self.keysDown.add(keycode)
