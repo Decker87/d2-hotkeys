@@ -1,1 +1,1 @@
-from test import hello as poop
+from main import runFromJsonConfig

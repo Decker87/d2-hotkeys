@@ -1,31 +1,10 @@
-from injectinput import pressKey, releaseKey, tapKey, pressMouseButton, releaseMouseButton, tapMouseButton
+from injectinput import tapKey, pressMouseButton, releaseMouseButton
 from hooks import Hooker
 from keycodes import keyCodes
 from time import sleep
 from winsound import Beep
 from collections import namedtuple
-
-QuickKeyMapping = namedtuple('QuickKeyMapping', ['preKey', 'button'])
-
-# Settings
-pauseKey = keyCodes["`"]
-chatKey = keyCodes["ENTER"]
-quickKeyMappings = {}
-quickKeyMappings[keyCodes["Q"]] = QuickKeyMapping(None, "left")
-quickKeyMappings[keyCodes["W"]] = QuickKeyMapping(keyCodes["F6"], "right")
-quickKeyMappings[keyCodes["E"]] = QuickKeyMapping(keyCodes["F7"], "right")
-quickKeyMappings[keyCodes["R"]] = QuickKeyMapping(keyCodes["F8"], "right")
-quickKeyMappings[keyCodes["A"]] = QuickKeyMapping(keyCodes["F9"], "right")
-quickKeyMappings[keyCodes["S"]] = QuickKeyMapping(keyCodes["F10"], "right")
-quickKeyMappings[keyCodes["D"]] = QuickKeyMapping(keyCodes["F11"], "right")
-quickKeyMappings[keyCodes["F"]] = QuickKeyMapping(keyCodes["F12"], "right")
-
-# Have to keep track of each button to know whether to push it down or not
-buttonDownCounts = {"left": 0, "right": 0}
-
-# States for managing hooking behavior
-isInGame = False
-isInChat = False
+import json, sys
 
 # Helpers
 def goodBeep():
@@ -34,72 +13,91 @@ def goodBeep():
 def badBeep():
     Beep(500, 250)
 
-def beepGameState():
-    if isInGame:
+# Beeps a good beep if value is truthy, else bad beep
+def beepTrueOrFalse(value):
+    if value:
         goodBeep()
     else:
         badBeep()
 
 # Main logic
-def processHookedEvents(hooker):
-    global isInGame, isInChat
+def processHookedEvents(hooker, keyConfig):
+    # State tracking
+    isInGame = False
+    isInChat = False
+    buttonDownCounts = {"left": 0, "right": 0}  # Track each button to know whether to push it down or not
+
+    quickKeyMappings = keyConfig["quickKeys"]
 
     while True:
-        keyEvent = hooker.eventQueue.get()
+        try:
+            keyEvent = hooker.eventQueue.get()
 
-        # First see if it was the special key to enable / disable hooking
-        if keyEvent.keycode == pauseKey:
+            # First see if it was the special key to enable / disable hooking
+            if keyEvent.keycode == keyConfig["pauseKey"]:
+                if keyEvent.isDownEvent:
+                    isInGame = not isInGame
+                    beepTrueOrFalse(isInGame)
+                    if isInGame:
+                        isInChat = False
+                        hooker.unpause()
+                    else:
+                        hooker.pause()
+                continue
+
+            # Next see if it's the enter key, and if it is, manage chat state
+            if keyEvent.keycode == keyConfig["chatKey"]:
+                if keyEvent.isDownEvent and isInGame:
+                    isInChat = not isInChat
+                    if isInChat:
+                        hooker.pause()
+                    else:
+                        hooker.unpause()
+                continue
+
+            # Now it must be one of the quick keys. Find the mapping in dict and do what we need to.
+            quickKeyMapping = quickKeyMappings[keyEvent.keycode]
+
+            # Key down event
             if keyEvent.isDownEvent:
-                isInGame = not isInGame
-                beepGameState()
-                if isInGame:
-                    isInChat = False
-                    hooker.unpause()
-                else:
-                    hooker.pause()
-            continue
+                if quickKeyMapping.preKey:
+                    tapKey(quickKeyMapping.preKey, delayMid = 0.02, delayAfter = 0.02)
+                if buttonDownCounts[quickKeyMapping.button] == 0:
+                    pressMouseButton(quickKeyMapping.button, delay = 0)
+                buttonDownCounts[quickKeyMapping.button] += 1
 
-        # Next see if it's the enter key, and if it is, manage chat state
-        if keyEvent.keycode == chatKey:
-            if keyEvent.isDownEvent and isInGame:
-                isInChat = not isInChat
-                if isInChat:
-                    hooker.pause()
-                else:
-                    hooker.unpause()
-            continue
+            # Key up event
+            else:
+                # If we get a key up without keydown, don't go negative
+                if buttonDownCounts[quickKeyMapping.button] > 0:
+                    buttonDownCounts[quickKeyMapping.button] -= 1
+                if buttonDownCounts[quickKeyMapping.button] == 0:
+                    releaseMouseButton(quickKeyMapping.button, delay = 0)
+        except:
+            badBeep()
+            print "ERROR: %s" % (sys.exc_info()[0])
 
-        # Now it must be one of the quick keys. Find the mapping in dict and do what we need to.
-        quickKeyMapping = quickKeyMappings[keyEvent.keycode]
-
-        # Key down event
-        if keyEvent.isDownEvent:
-            if quickKeyMapping.preKey:
-                tapKey(quickKeyMapping.preKey, delayMid = 0.02, delayAfter = 0.02)
-            if buttonDownCounts[quickKeyMapping.button] == 0:
-                pressMouseButton(quickKeyMapping.button, delay = 0)
-            buttonDownCounts[quickKeyMapping.button] += 1
-
-        # Key up event
-        else:
-            # If we get a key up without keydown, don't go negative
-            if buttonDownCounts[quickKeyMapping.button] > 0:
-                buttonDownCounts[quickKeyMapping.button] -= 1
-            if buttonDownCounts[quickKeyMapping.button] == 0:
-                releaseMouseButton(quickKeyMapping.button, delay = 0)
-
-def startHooking():
-    global quickKeyMappings
+def runFromJsonConfig():
+    config = json.load(open("config.json"))
 
     # Generate a list of key behaviors
+    tQuickKeyMapping = namedtuple('tQuickKeyMapping', ['preKey', 'button'])
     keyHookBehaviors = []
+    keyConfig = {}
     
     # Pause and message are two special cases
-    keyHookBehaviors.append(Hooker.tKeyHookBehavior(keycode = pauseKey, passThrough = False, ignorePause = True))
-    keyHookBehaviors.append(Hooker.tKeyHookBehavior(keycode = chatKey, passThrough = True, ignorePause = True))
+    keyConfig["pauseKey"] = keyCodes[config["pauseKey"]]
+    keyConfig["chatKey"] = keyCodes[config["chatKey"]]
+    keyHookBehaviors.append(Hooker.tKeyHookBehavior(keycode = keyConfig["pauseKey"], passThrough = False, ignorePause = True))
+    keyHookBehaviors.append(Hooker.tKeyHookBehavior(keycode = keyConfig["chatKey"], passThrough = True, ignorePause = True))
 
-    # Add hooks from quick keys
-    for keycode in quickKeyMappings:
+    # Quick keys
+    keyConfig["quickKeys"] = {}
+    for quickKeyEntry in config["quickKeys"]:
+        keycode = keyCodes[quickKeyEntry["hookedKey"]]
+        preKey = keyCodes[quickKeyEntry["preKey"]] if quickKeyEntry["preKey"] else None
+        button = quickKeyEntry["button"]
+        keyConfig["quickKeys"][keycode] = tQuickKeyMapping(preKey, button)
         keyHookBehaviors.append(Hooker.tKeyHookBehavior(keycode = keycode, passThrough = False, ignorePause = False))
 
     # Start it up scotty
@@ -107,9 +105,11 @@ def startHooking():
     hooker.start()
     hooker.pause()
     badBeep()
+    processHookedEvents(hooker, keyConfig)
 
-    return hooker
-
-if __name__ == "__main__":
+def main():
     hooker = startHooking()
     processHookedEvents(hooker)
+
+if __name__ == "__main__":
+    runFromJsonConfig()

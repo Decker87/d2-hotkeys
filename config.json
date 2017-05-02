@@ -1,0 +1,14 @@
+{
+    "pauseKey": "`",
+    "chatKey": "ENTER",
+    "quickKeys": [
+        {"hookedKey": "Q", "preKey": "", "button": "left"},
+        {"hookedKey": "W", "preKey": "F6", "button": "right"},
+        {"hookedKey": "E", "preKey": "F7", "button": "right"},
+        {"hookedKey": "R", "preKey": "F8", "button": "right"},
+        {"hookedKey": "A", "preKey": "F9", "button": "right"},
+        {"hookedKey": "S", "preKey": "F10", "button": "right"},
+        {"hookedKey": "D", "preKey": "F11", "button": "right"},
+        {"hookedKey": "F", "preKey": "F12", "button": "right"}
+    ]
+}
