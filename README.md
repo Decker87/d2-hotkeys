@@ -8,13 +8,14 @@ It works by doing exactly what players do - it quickly presses the F-keys and th
 
 1. From the [releases](https://github.com/Decker87/d2-hotkeys/releases), download an install file
 1. Run the install file, it will install by default to `C:\Program Files (x86)\d2Hotkeys`
-1. From the start menu, run "d2Hotkeys"
+1. From the start menu, run "d2Hotkeys" AS ADMINISTRATOR
 1. To terminate the program, use the task manager. Look for "pythonw".
 
 # Installation (programmers)
 
 1. Pull the source code
 1. Install the external packages: `pythoncom` and `pyHook`
+1. Open a terminal AS ADMINISTRATOR
 1. Navigate to the base repo, and do: `python d2Hotkeys/main.py`
 
 Note: This requires python 2.7.
