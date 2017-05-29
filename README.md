@@ -1,6 +1,8 @@
 # Intro
 
-This is keyboard & mouse macro program to allow one to use hotkeys to cast D2 skills. For example, pressing the W key will cast the skill mapped to F5. This allows casting many skills without constantly hitting the F keys and right clicking. This is especially helpful for those with carpal tunnel syndrome or RSI, as mouse clicks can be very painful.
+d2-hotkeys is a keyboard macro program to help relieve pain caused by carpal tunnel and RSI when playing Diablo 2.
+
+This program maps mouse clicks to keyboard keys to allow one to use hotkeys to cast D2 skills. For example, pressing the W key will cast the skill mapped to F5. This allows casting many skills without constantly hitting the F keys and right clicking. This is especially helpful for those with carpal tunnel syndrome or RSI, as mouse clicks can be very painful.
 
 It works by doing exactly what players do - it quickly presses the F-keys and then right clicks to cast the skill.
 
@@ -39,3 +41,17 @@ By default, the mappings are:
 Notes:
 - These are configurable in d2-hotkeys-config.json (either in the install directory or in the repo you pulled).
 - The program will only have an effect while D2 is in the foreground.
+
+# FAQs
+
+Q: Is this approved for private servers?
+
+A: At the moment I have not sought approval from any private server hosts, so I would advise using it only for single player until it is approved.
+
+Q: Nothing seems to be happening, why?
+
+A: Check that the python process is running. If it isn't, double-check you are running as admin.
+
+Q: It's not working, how can I get help?
+
+A: Message me on reddit.
