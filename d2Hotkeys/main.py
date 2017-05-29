@@ -95,6 +95,10 @@ def getConfig():
     except:
         pass
 
+    # Fuck
+    print "Could not find config file, exiting."
+    exit()
+
 def runFromJsonConfig():
     config = getConfig()
 
