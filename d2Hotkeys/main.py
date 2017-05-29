@@ -4,7 +4,7 @@ from keycodes import keyCodes
 from time import sleep
 from winsound import Beep
 from collections import namedtuple
-import json, sys
+import json, sys, os, inspect
 
 # Helpers
 def goodBeep():
@@ -77,8 +77,26 @@ def processHookedEvents(hooker, keyConfig):
             badBeep()
             print "ERROR: %s" % (sys.exc_info()[0])
 
+def getConfig():
+    # Try current working directory
+    try:
+        config = json.load(open("d2-hotkeys-config.json"))
+        print "Found config in CWD"
+        return config
+    except:
+        pass
+
+    # Try 2 directories up from this file's location
+    try:
+        configPath = os.path.dirname(os.path.abspath(inspect.stack()[0][1])) + "%s..%s..%sd2-hotkeys-config.json" % (os.sep, os.sep, os.sep)
+        config = json.load(open(configPath))
+        print "Found config 2 dirs up from file"
+        return config
+    except:
+        pass
+
 def runFromJsonConfig():
-    config = json.load(open("config.json"))
+    config = getConfig()
 
     # Generate a list of key behaviors
     tQuickKeyMapping = namedtuple('tQuickKeyMapping', ['preKey', 'button'])

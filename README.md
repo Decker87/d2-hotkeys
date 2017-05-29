@@ -11,6 +11,8 @@ It works by doing exactly what players do - it quickly presses the F-keys and th
 1. From the start menu, run "d2Hotkeys" AS ADMINISTRATOR
 1. To terminate the program, use the task manager. Look for "pythonw".
 
+Note: I know it's inconvenient to terminate the program this way, but it only does its thing while D2 is in the foreground, so in practice you can just keep it running all the time.
+
 # Installation (programmers)
 
 1. Pull the source code
@@ -34,4 +36,6 @@ By default, the mappings are:
 - W,E,R = F6,F7,F8 skills; right click
 - A,S,D,F = F9,F10,F11,F12 skills; right click
 
-These are configurable in config.json (either in the install directory or in the repo you pulled).
+Notes:
+- These are configurable in d2-hotkeys-config.json (either in the install directory or in the repo you pulled).
+- The program will only have an effect while D2 is in the foreground.
