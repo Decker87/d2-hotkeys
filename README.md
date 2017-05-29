@@ -32,3 +32,5 @@ By default, the mappings are:
 - Q = left click
 - W,E,R = F6,F7,F8 skills; right click
 - A,S,D,F = F9,F10,F11,F12 skills; right click
+
+These are configurable in config.json (either in the install directory or in the repo you pulled).
