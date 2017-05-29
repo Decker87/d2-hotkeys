@@ -24,6 +24,7 @@ Note: This requires python 2.7.
 
 1. The program will beep once to signal that it is running and listening for hotkeys.
 1. The `~` key toggles the program on and off. A higher pitched beep means it's on.
+1. Try toggling it a few times to see if you get higher and lower pitched beeps, then stop toggling after a high pitched beep.
 1. Map teleport to F8.
 1. With the program on, press R to teleport.
 1. Note that the program will attempt to track how many times you press "Enter" so that you can still chat in game without casting skills. If you press Enter to do things like joining a game, it may get thrown off. To reset it just toggle with the `~` key.
