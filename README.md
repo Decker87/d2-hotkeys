@@ -52,6 +52,10 @@ Q: Nothing seems to be happening, why?
 
 A: Check that the python process is running. If it isn't, double-check you are running as admin.
 
+Q: It's running but the hotkeys are not working.
+
+A: Try toggling it on and off with the `~` key. You may need to do this after pressing "Enter" in a game menu. The problem is the program doesn't know the difference between Enter used to start a chat or used some other way.
+
 Q: It's not working, how can I get help?
 
 A: Message me on reddit.
